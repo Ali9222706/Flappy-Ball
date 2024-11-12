@@ -6,6 +6,8 @@ let gravity = 2;
 let isGameOver = false;
 let score = 0;
 let pipes = [];
+const birdJumpStrength = 40;
+const birdMaxHeight = 0;
 
 function startGame() {
     bird.style.top = birdTop + 'px';
@@ -17,7 +19,11 @@ function gameLoop() {
     if (isGameOver) return;
 
     // Apply gravity to bird
-    birdTop += gravity;
+    if (birdTop < gameContainer.offsetHeight - bird.offsetHeight) {
+        birdTop += gravity;
+    } else {
+        birdTop = gameContainer.offsetHeight - bird.offsetHeight;
+    }
     bird.style.top = birdTop + 'px';
 
     // Move pipes and detect collisions
@@ -41,7 +47,8 @@ function gameLoop() {
         }
     });
 
-    if (birdTop > gameContainer.offsetHeight - bird.offsetHeight || birdTop < 0) {
+    // Game Over condition if bird hits top or bottom of screen
+    if (birdTop > gameContainer.offsetHeight - bird.offsetHeight || birdTop < birdMaxHeight) {
         endGame();
     } else {
         requestAnimationFrame(gameLoop);
@@ -96,9 +103,12 @@ function endGame() {
     location.reload();
 }
 
-document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space' && !isGameOver) {
-        birdTop -= 40;
+// Add event listener for mouse click to make the bird jump
+gameContainer.addEventListener('click', () => {
+    if (!isGameOver) {
+        if (birdTop - birdJumpStrength >= birdMaxHeight) {
+            birdTop -= birdJumpStrength;
+        }
     }
 });
 
